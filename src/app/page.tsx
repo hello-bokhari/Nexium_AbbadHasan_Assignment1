@@ -54,7 +54,7 @@ export default function Home() {
           <p className="text-2xl sm:text-3xl md:text-4xl font-semibold text-gray-800 italic">
             “{quoteOfDay}”
           </p>
-          <p className="text-sm text-gray-500">This is the quote of the day</p>
+          <p className="text-sm text-gray-500">Quote of the Day</p>
         </div>
 
         {/* Selector + Generate */}
