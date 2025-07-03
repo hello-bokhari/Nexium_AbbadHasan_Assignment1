@@ -1,75 +1,107 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { quotes } from "./quotes";
 import {
   Select,
-  SelectContent,
-  SelectItem,
   SelectTrigger,
   SelectValue,
+  SelectContent,
+  SelectItem,
 } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 
-const topics = [...new Set(quotes.map((q) => q.topic))];
+// Unique topics
+const topics = ["random", ...new Set(quotes.map((q) => q.topic))];
 
 export default function Home() {
-  const [selectedTopic, setSelectedTopic] = useState("");
+  const [topic, setTopic] = useState("random");
+  const [quoteOfDay, setQuoteOfDay] = useState<string>("");
   const [results, setResults] = useState<string[]>([]);
+  const [renderKey, setRenderKey] = useState(0); // 🔑 new state
 
-  const handleTopicChange = (value: string) => {
-    setSelectedTopic(value);
-    const matched = quotes
-      .filter((q) => q.topic.toLowerCase() === value.toLowerCase())
+  // Load quote of the day on first render
+  useEffect(() => {
+    const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+    setQuoteOfDay(randomQuote.text);
+  }, []);
+
+  const generateQuotes = () => {
+    const filtered =
+      topic === "random"
+        ? quotes
+        : quotes.filter((q) => q.topic.toLowerCase() === topic.toLowerCase());
+
+    const selected = [...filtered]
+      .sort(() => Math.random() - 0.5)
       .slice(0, 3)
       .map((q) => q.text);
-    setResults(matched);
+
+    setResults(selected);
+    setRenderKey((prev) => prev + 1); // 👈 trigger animation only on click
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center p-6">
-      <div className="w-full max-w-xl bg-white/80 backdrop-blur-md rounded-2xl shadow-xl p-8 space-y-8 border border-white">
-        <h1 className="text-4xl font-extrabold text-center text-indigo-700 drop-shadow">
-           Quote Generator
-        </h1>
+    <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-violet-100 to-blue-100 p-6">
+      <div className="w-full max-w-2xl bg-white/80 backdrop-blur-md p-8 rounded-xl shadow-xl space-y-10 border border-white">
 
-        <Select onValueChange={handleTopicChange}>
-          <SelectTrigger className="w-full bg-white text-indigo-700 font-medium border border-indigo-300 shadow-sm">
-            <SelectValue placeholder="Choose a topic" />
-          </SelectTrigger>
-          <SelectContent>
-            {topics.map((topic) => (
-              <SelectItem key={topic} value={topic} className="capitalize">
-                {topic}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {/* Title */}
+        <h1 className="text-5xl font-bold text-center text-violet-800">Quotes</h1>
 
-        <div className="space-y-4">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={selectedTopic}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.4 }}
-              className="space-y-4"
-            >
-              {results.map((quote, idx) => (
-                <motion.p
-                  key={quote}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.4, delay: idx * 0.1 }}
-                  className="bg-indigo-50 text-indigo-900 p-4 rounded-lg shadow-md border-l-4 border-indigo-500 italic"
-                >
-                  {quote}
-                </motion.p>
-              ))}
-            </motion.div>
-          </AnimatePresence>
+        {/* Quote of the Day */}
+        <div className="text-center space-y-2">
+          <p className="text-2xl sm:text-3xl md:text-4xl font-semibold text-gray-800 italic">
+            “{quoteOfDay}”
+          </p>
+          <p className="text-sm text-gray-500">This is the quote of the day</p>
         </div>
+
+        {/* Selector + Generate */}
+        <div className="flex flex-col md:flex-row gap-4 items-center justify-center">
+          <Select value={topic} onValueChange={setTopic}>
+            <SelectTrigger className="w-full md:w-64 bg-white text-violet-700 border border-violet-300 shadow-sm">
+              <SelectValue placeholder="Select topic" />
+            </SelectTrigger>
+            <SelectContent>
+              {topics.map((t) => (
+                <SelectItem key={t} value={t}>
+                  {t.charAt(0).toUpperCase() + t.slice(1)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button
+            onClick={generateQuotes}
+            className="bg-violet-600 hover:bg-violet-700 text-white px-6"
+          >
+            Generate
+          </Button>
+        </div>
+
+        {/* Generated Quotes */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={renderKey} // animation only when "Generate" is clicked
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.4 }}
+            className="space-y-4"
+          >
+            {results.map((quote, idx) => (
+              <motion.p
+                key={quote}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.4, delay: idx * 0.1 }}
+                className="bg-violet-50 border-l-4 border-violet-500 text-violet-900 p-4 rounded shadow-sm italic"
+              >
+                {quote}
+              </motion.p>
+            ))}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </main>
   );
