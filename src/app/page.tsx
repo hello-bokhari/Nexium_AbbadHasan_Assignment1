@@ -19,7 +19,7 @@ export default function Home() {
   const [topic, setTopic] = useState("random");
   const [quoteOfDay, setQuoteOfDay] = useState<string>("");
   const [results, setResults] = useState<string[]>([]);
-  const [renderKey, setRenderKey] = useState(0); // 🔑 new state
+  const [renderKey, setRenderKey] = useState(0);
 
   // Load quote of the day on first render
   useEffect(() => {
@@ -39,7 +39,7 @@ export default function Home() {
       .map((q) => q.text);
 
     setResults(selected);
-    setRenderKey((prev) => prev + 1); // 👈 trigger animation only on click
+    setRenderKey((prev) => prev + 1);
   };
 
   return (
@@ -82,7 +82,7 @@ export default function Home() {
         {/* Generated Quotes */}
         <AnimatePresence mode="wait">
           <motion.div
-            key={renderKey} // animation only when "Generate" is clicked
+            key={renderKey}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
