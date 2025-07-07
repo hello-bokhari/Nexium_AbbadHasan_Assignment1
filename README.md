@@ -16,7 +16,7 @@ A simple and elegant web application that displays motivational quotes based on 
 
 ## 📸 Preview
 
-[Quote Generator](quotegenerator-9j88ogaxy-abbad-hasans-projects.vercel.app)
+[Quote Generator](https://nexium-abbad-hasan-assignment1.vercel.app/)
 
 ---
 
